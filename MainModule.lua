@@ -2,6 +2,8 @@ local module = {}
 
 local BadgeService = game:GetService("BadgeService")
 local MarketplaceService = game:GetService("MarketplaceService")
+local UserInputService = game:GetService('UserInputService')
+local RunService = game:GetService("RunService")
 
 local ErrorsModule = require(script.ErrorsModule)
 
@@ -93,6 +95,72 @@ function module.GetAccountAgeInYears(plr)
 	if typeof(plr) ~= "Instance" then warn(string.format(ErrorsModule[404], "GetAccountAgeInYears", 1, "Instancia", typeof(plr))) return end
 	if not plr:IsA("Player") then warn(string.format(ErrorsModule[405], "GetAccountAgeInYears", plr.Name.." Não é um jogador")) return end
 	return math.floor(plr.AccountAge/365 * 1)/1
+end
+
+function module.PlayerIsOnTeam(plr, team)
+	if typeof(plr) ~= "Instance" then warn(string.format(ErrorsModule[404], "PlayerIsOnTeam", 1, "Instancia", typeof(plr))) return end
+	if typeof(plr) == "Instance" and not plr:IsA("Player") then warn(string.format(ErrorsModule[405], "PlayerIsOnTeam", plr.Name.." Não é um jogador")) return end
+	if typeof(team) == "BrickColor" or typeof(team) == "Instance" then else warn(string.format(ErrorsModule[404], "PlayerIsOnTeam", 2, "BrickColor ou Instancia", typeof(team))) return end
+	if typeof(team) == "Instance" and not team:IsA("Team") then warn(string.format(ErrorsModule[405], "PlayerIsOnTeam", team.Name.." Não é um time")) return end
+	
+	if typeof(team) == "Instance" then if plr.Team == team then return true end end
+	if typeof(team) == "BrickColor" then if plr.TeamColor == team then return true end end
+	return false
+end
+
+function module.SetPlayerTeam(plr, team)
+	if typeof(plr) ~= "Instance" then warn(string.format(ErrorsModule[404], "SetPlayerTeam", 1, "Instancia", typeof(plr))) return end
+	if typeof(plr) == "Instance" and not plr:IsA("Player") then warn(string.format(ErrorsModule[405], "SetPlayerTeam", plr.Name.." Não é um jogador")) return end
+	if typeof(team) == "BrickColor" or typeof(team) == "Instance" then else warn(string.format(ErrorsModule[404], "SetPlayerTeam", 2, "BrickColor ou Instancia", typeof(team))) return end
+	if typeof(team) == "Instance" and not team:IsA("Team") then warn(string.format(ErrorsModule[405], "SetPlayerTeam", team.Name.." Não é um time")) return end
+	
+	if typeof(team) == "Instance" then
+		plr.Team = team
+	end
+	if typeof(team) == "BrickColor" then
+		plr.TeamColor = team
+	end
+end
+
+function module.GetPlayerPlatform()
+	if UserInputService.VREnabled == true then
+		return "Vr"
+	end
+	if UserInputService.KeyboardEnabled == true then
+		return "Pc"
+	end
+	if UserInputService.GamepadEnabled == true then
+		return "Console"
+	end
+	if UserInputService.TouchEnabled == true then
+		return "Mobile"
+	end
+end
+
+function module.IsPrivateServer()
+	if game.PrivateServerId ~= "" then
+		return true
+	else
+		return false
+	end
+end
+
+function module.GetPlayerByPrivateServerOwner()
+	if game.Players:GetPlayerByUserId(game.PrivateServerOwnerId) == nil then
+		return nil
+	else
+		return game.Players:GetPlayerByUserId(game.PrivateServerOwnerId)
+	end
+end
+
+function module.PlayerIsPrivateServerOwner(plr)
+	if typeof(plr) ~= "Instance" then warn(string.format(ErrorsModule[404], "GetPlayerByPrivateServerOwner", 1, "Instancia", typeof(plr))) return end
+	if typeof(plr) == "Instance" and plr:IsA("Player") then else warn(string.format(ErrorsModule[405], "GetPlayerByPrivateServerOwner", plr.Name.."Não é um jogador")) return end
+	if plr.UserId == game.PrivateServerOwnerId then
+		return true
+	else
+		return false
+	end
 end
 
 return module
